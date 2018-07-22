@@ -1,45 +1,16 @@
 apply plugin: 'com.android.library'
-apply plugin: 'realm-android'
-apply from: 'maven-push.gradle'
-apply plugin: 'maven-publish'
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            groupId 'com.github.ajitsing'
-            artifactId 'sherlock'
-            version '1.0.0'
-            artifact bundleRelease
-            pom.withXml {
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-                //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
-                configurations.compile.allDependencies.each {
-                    if (it.group != null && it.name != null) {
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
-                    }
-                }
-            }
-        }
-    }
-    repositories {
-        mavenLocal()
-    }
+ext {
+    artifactId = 'sherlock'
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
-    group "com.github.ajitsing"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -59,7 +30,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'io.reactivex:rxjava:1.1.0'
 
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
@@ -68,3 +38,5 @@ dependencies {
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
     androidTestCompile 'org.mockito:mockito-core:1.10.19'
 }
+
+apply from: rootProject.file('gradle/publish.gradle')

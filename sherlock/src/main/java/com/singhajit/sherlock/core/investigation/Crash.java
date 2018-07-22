@@ -2,13 +2,13 @@ package com.singhajit.sherlock.core.investigation;
 
 import com.singhajit.sherlock.core.Sherlock;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-
-public class Crash extends RealmObject {
-  @PrimaryKey
+public class Crash {
   private int id;
   private DeviceInfo deviceInfo;
   private AppInfo appInfo;
@@ -16,9 +16,7 @@ public class Crash extends RealmObject {
   private String reason;
   private String stackTrace;
   private Date date;
-
-  public Crash() {
-  }
+  public static final String DATE_FORMAT = "EEE MMM dd kk:mm:ss z yyyy";
 
   public Crash(String place, String reason, String stackTrace) {
     this.place = place;
@@ -31,16 +29,23 @@ public class Crash extends RealmObject {
     }
   }
 
+  public Crash(int id, String placeOfCrash, String reasonOfCrash, String stacktrace, String date) {
+    this(placeOfCrash, reasonOfCrash, stacktrace);
+    this.id = id;
+    DateFormat df = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
+    try {
+      this.date = df.parse(date);
+    } catch (ParseException e) {
+      this.date = new Date();
+    }
+  }
+
   public DeviceInfo getDeviceInfo() {
     return deviceInfo;
   }
 
   public AppInfo getAppInfo() {
     return appInfo;
-  }
-
-  public void setId(int id) {
-    this.id = id;
   }
 
   public Class<Crash> getType() {
@@ -65,5 +70,9 @@ public class Crash extends RealmObject {
 
   public Date getDate() {
     return date;
+  }
+
+  public void setId(int id) {
+    this.id = id;
   }
 }
